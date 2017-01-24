@@ -1,6 +1,6 @@
 # win_ad
 
-Chef  Windows Active Directory (AD) and Domain Name Service (DNS) Cookbook
+Windows Active Directory (AD) and Domain Name Service (DNS) Cookbook
 =============================================
 
 Requirements

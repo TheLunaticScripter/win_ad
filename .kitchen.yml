@@ -1,0 +1,25 @@
+driver:
+  name: hyperv
+  parent_vhd_folder: C:\Hyper-V
+  parent_vhd_name: WindowsServer2012R2.vhdx
+  vm_switch: ExternalSwitch
+  memory_startup_bytes: 2GB
+
+provisioner:
+  name: chef_zero
+
+transport:
+  password: '!QAZSE$1qazse4'
+
+platforms:
+  - name: windows-2012r2
+
+verifier:
+  name: inspec
+
+suites:
+  - name: default
+    run_list:
+      - recipe[win_ad::default]
+    attributes:
+

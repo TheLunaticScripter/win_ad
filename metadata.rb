@@ -1,0 +1,7 @@
+name 'win_ad'
+maintainer 'John Snow'
+maintainer_email 'jsnow@chef.io'
+license 'all_rights'
+description 'Installs/Configures win_ad'
+long_description 'Installs/Configures win_ad'
+version '2.0.8'

@@ -20,5 +20,8 @@
       "chef_server": "true"
     }
   },
+  "job_dispatch": {
+    "version": "v2"
+  },
   "dependencies": []
 }

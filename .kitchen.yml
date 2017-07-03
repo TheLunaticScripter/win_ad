@@ -1,18 +1,25 @@
+---
 driver:
-  name: hyperv
-  parent_vhd_folder: C:\Hyper-V
-  parent_vhd_name: WindowsServer2012R2.vhdx
-  vm_switch: ExternalSwitch
-  memory_startup_bytes: 2GB
+  name: vagrant
+
+transport:
+  name: winrm
+  elevated: true
 
 provisioner:
   name: chef_zero
-
-transport:
-  password: '!QAZSE$1qazse4'
+  retry_on_exit_code:
+    - 35
+  max_retries: 3
+  wait_for_retry: 90
+  client_rb:
+    exit_status: :enabled
+    client_fork: false
 
 platforms:
   - name: windows-2012r2
+    driver_config:
+      box: opentable/win-2012r2-standard-amd64-nocm
 
 verifier:
   name: inspec

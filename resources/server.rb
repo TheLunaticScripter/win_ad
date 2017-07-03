@@ -15,7 +15,6 @@ def whyrun_supported?
   true
 end
 
-
 action :install_ad_services do
   if exists?
     @new_resource.updated_by_last_action(false)
@@ -23,9 +22,9 @@ action :install_ad_services do
     [
       'AD-Domain-Services',
       'DNS',
-      'RSAT-DNS-Server'
-    ].each do |feature| 
-      dsc_script "#{feature}" do
+      'RSAT-DNS-Server',
+    ].each do |feature|
+      dsc_script feature do
         code <<-EOH
           WindowsFeature "#{feature}"
           {
@@ -33,18 +32,24 @@ action :install_ad_services do
               Ensure = "Present"
           }
         EOH
-      end 
+      end
     end
 
     cmd = create_command
     cmd << " -DomainName #{domain_name}"
     cmd << " -SafeModeAdministratorPassword (convertto-securestring '#{safe_mode_pass}' -asplaintext -Force)"
     cmd << ' -Force:$true'
-    cmd << ' -NoRebootOnCompletion' if !restart
-	#cmd << format_options(options)
-    
+    cmd << ' -NoRebootOnCompletion'
+
     powershell_script "create_domain_#{domain_name}" do
       code cmd
+    end
+
+    reboot 'server_requires_reboot' do
+      action :request_reboot
+      reason 'Installation of Active Directory requires a reboot'
+      delay_mins 1
+      only_if restart
     end
 
     @new_resource.updated_by_last_action(true)

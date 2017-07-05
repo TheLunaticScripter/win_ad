@@ -43,13 +43,13 @@ action :install_ad_services do
 
     powershell_script "create_domain_#{domain_name}" do
       code cmd
+      notifies :request_reboot, 'reboot[rebood_for_ad]'
     end
 
-    reboot 'server_requires_reboot' do
-      action :request_reboot
-      reason 'Installation of Active Directory requires a reboot'
+    reboot 'reboot_for_ad' do
+      action :nothing
+      reason 'Rebooting server to complete install of AD.'
       delay_mins 1
-      only_if restart
     end
 
     @new_resource.updated_by_last_action(true)

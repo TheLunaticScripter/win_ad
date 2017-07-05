@@ -43,7 +43,7 @@ action :install_ad_services do
 
     powershell_script "create_domain_#{domain_name}" do
       code cmd
-      notifies :request_reboot, 'reboot[rebood_for_ad]'
+      notifies :request_reboot, 'reboot[reboot_for_ad]'
     end
 
     reboot 'reboot_for_ad' do

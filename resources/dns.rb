@@ -19,48 +19,48 @@ def whyrun_supported?
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::WindowsAdDns.new(@new_resource.name)
+  @current_resource = Chef::Resource::WindowsAdDns.new(new_resource.name)
 end
 
 action :create do
   if exists?
-    @new_resource.updated_by_last_action(false)
+    new_resource.updated_by_last_action(false)
   else
-    powershell_script "Create #{record_type} record in DNS." do
+    powershell_script "Create #{new_resource.record_type} record in DNS." do
       code create_cmd
     end
-    @new_resource.updated_by_last_action(true)
+    new_resource.updated_by_last_action(true)
   end
 end
 
 def create_cmd
   cmd = ''
   cmd << 'Add-DnsServerResourceRecord'
-  cmd << " -ZoneName #{zone_name}"
-  cmd << " -Name #{name}"
+  cmd << " -ZoneName #{new_resource.zone_name}"
+  cmd << " -Name #{new_resource.name}"
   case record_type
   when 'A'
     cmd << ' -A'
-    cmd << " -IPv4Address #{ipv4_address}"
+    cmd << " -IPv4Address #{new_resource.ipv4_address}"
     if create_ptr == true
       cmd << " -CreatePtr"
     end
   when 'MX'
     cmd << ' -Mx'
-    cmd << " -MailExchange #{mail_exchange}"
-    cmd << " -Preference #{preference}"
+    cmd << " -MailExchange #{new_resource.mail_exchange}"
+    cmd << " -Preference #{new_resource.preference}"
   when 'CName'
     cmd << ' -CName'
-    cmd << " -HostNameAlias #{host_name_alias}"
+    cmd << " -HostNameAlias #{new_resource.host_name_alias}"
   when 'SRV'
     cmd << ' -Srv'
-    cmd << " -DomainName #{host_name}"
-    cmd << " -Port #{port}"
-    cmd << " -Priority #{priority}"
-    cmd << " -Weight #{weight}"
+    cmd << " -DomainName #{new_resource.host_name}"
+    cmd << " -Port #{new_resource.port}"
+    cmd << " -Priority #{new_resource.priority}"
+    cmd << " -Weight #{new_resource.weight}"
   else
     cmd = ''
-    Chef::Log.error("The record_type of #{record_type} is not vaild.")
+    Chef::Log.error("The record_type of #{new_resource.record_type} is not vaild.")
   end
   cmd
 end
@@ -68,9 +68,9 @@ end
 def exists?
   cmd = ''
   cmd << '$record = Get-DnsServerResourceRecord'
-  cmd << " -ZoneName #{zone_name}"
-  cmd << " -Name #{name}"
-  cmd << " -RRType #{record_type};"
+  cmd << " -ZoneName #{new_resource.zone_name}"
+  cmd << " -Name #{new_resource.name}"
+  cmd << " -RRType #{new_resource.record_type};"
   cmd << '$record -ne $null'
   check = Mixlib::ShellOut.new("powershell.exe -command \"& {#{cmd}}\"").run_command
   check.stdout.match('True')

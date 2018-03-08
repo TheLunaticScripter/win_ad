@@ -5,7 +5,7 @@
 # Copyright (c) 2016 The Authors, All Rights Reserved.
 
 # Install Windows Active Directory Services
-win_ad_server 'foo.local' do
+win_ad_server 'Build foo.local' do
   action :install_ad_services
   domain_name 'foo.local'
   safe_mode_pass '!QAZSE$1qazse4'

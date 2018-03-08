@@ -1,23 +1,13 @@
-require 'mixlib/shellout'
-
-property :domain_name, kind_of: String, name_property: true
-property :restart, kind_of: [TrueClass, FalseClass], required: true, default: true
-property :safe_mode_pass, kind_of: String, required: true
-property :type, kind_of: String, required: true
-property :domain_user, kind_of: String
-property :domain_pass, kind_of: String
-
-def load_current_resource
-  @current_resource = Chef::Resource::WindowsAdServer.new(@new_resource.domain_name)
-end
-
-def whyrun_supported?
-  true
-end
+property :domain_name, String, required: true
+property :restart, [true, false], default: true
+property :safe_mode_pass, String, required: true
+property :type, String, required: true
+property :domain_user, String
+property :domain_pass, String
 
 action :install_ad_services do
   if exists?
-    @new_resource.updated_by_last_action(false)
+    new_resource.updated_by_last_action(false)
   else
     [
       'AD-Domain-Services',
@@ -36,12 +26,12 @@ action :install_ad_services do
     end
 
     cmd = create_command
-    cmd << " -DomainName #{domain_name}"
-    cmd << " -SafeModeAdministratorPassword (convertto-securestring '#{safe_mode_pass}' -asplaintext -Force)"
+    cmd << " -DomainName #{new_resource.domain_name}"
+    cmd << " -SafeModeAdministratorPassword (convertto-securestring '#{new_resource.safe_mode_pass}' -asplaintext -Force)"
     cmd << ' -Force:$true'
     cmd << ' -NoRebootOnCompletion'
 
-    powershell_script "create_domain_#{domain_name}" do
+    powershell_script "create_domain_#{new_resource.domain_name}" do
       code cmd
       notifies :request_reboot, 'reboot[reboot_for_ad]'
     end
@@ -51,29 +41,29 @@ action :install_ad_services do
       reason 'Rebooting server to complete install of AD.'
       delay_mins 1
     end
-
-    @new_resource.updated_by_last_action(true)
   end
 end
 
-def exists?
-  ldap_path = domain_name.split('.').map! { |k| "dc=#{k}" }.join(',')
-  check = Mixlib::ShellOut.new("powershell.exe -command [adsi]::Exists('LDAP://#{ldap_path}')").run_command
-  check.stdout.match('True')
-end
- 
-def create_command
-  cmd = ''
-  if type != 'forest'
-    cmd << "$secpasswd = ConvertTo-SecureString '#{domain_pass}' -AsPlainText -Force;"
-    cmd << "$mycreds = New-Object System.Management.Automation.PSCredential  ('#{domain_user}', $secpasswd);"
+action_class do
+  def exists?
+    ldap_path = new_resource.domain_name.split('.').map! { |k| "dc=#{k}" }.join(',')
+    check = Mixlib::ShellOut.new("powershell.exe -command [adsi]::Exists('LDAP://#{ldap_path}')").run_command
+    check.stdout.match('True')
   end
-  case type
-  when 'forest'
-    cmd << 'Install-ADDSForest'
-  when 'domain'
-    cmd << 'Install-ADDSDomain -Credential $mycreds'
-  when 'replica'
-    cmd << 'Install-ADDSDomainController -Credential $mycreds'
+
+  def create_command
+    cmd = ''
+    if new_resource.type != 'forest'
+      cmd << "$secpasswd = ConvertTo-SecureString '#{new_resource.domain_pass}' -AsPlainText -Force;"
+      cmd << "$mycreds = New-Object System.Management.Automation.PSCredential  ('#{new_resource.domain_user}', $secpasswd);"
+    end
+    case new_resource.type
+    when 'forest'
+      cmd << 'Install-ADDSForest'
+    when 'domain'
+      cmd << 'Install-ADDSDomain -Credential $mycreds'
+    when 'replica'
+      cmd << 'Install-ADDSDomainController -Credential $mycreds'
+    end
   end
 end

@@ -1,26 +1,15 @@
-property :name, name_attribute: true, kind_of: String, required: true
-property :zone_name, kind_of: String, required: true
-property :record_type, kind_of: String, required: true, default: 'A'
-property :allow_update_any, kind_of: [TrueClass, FalseClass], default: true
-property :ipv4_address, kind_of: String
-property :create_ptr, kind_of: [TrueClass, FalseClass], default: true
-property :host_name_alias, kind_of: String
-property :mail_exchange, kind_of: String
-property :preference, kind_of: Fixnum
-property :host_name, kind_of: String
-property :port, kind_of: Fixnum
-property :priority, kind_of: Fixnum
-property :weight, kind_of: Fixnum
-
-default_action :create
-
-def whyrun_supported?
-  true
-end
-
-def load_current_resource
-  @current_resource = Chef::Resource::WindowsAdDns.new(new_resource.name)
-end
+property :zone_name, String, required: true
+property :record_type, String, required: true, default: 'A'
+property :allow_update_any, [true, false], default: true
+property :ipv4_address, String
+property :create_ptr, [true, false], default: true
+property :host_name_alias, String
+property :mail_exchange, String
+property :preference, Integer
+property :host_name, String
+property :port, Integer
+property :priority, Integer
+property :weight, Integer
 
 action :create do
   if exists?
@@ -29,7 +18,6 @@ action :create do
     powershell_script "Create #{new_resource.record_type} record in DNS." do
       code create_cmd
     end
-    new_resource.updated_by_last_action(true)
   end
 end
 
@@ -42,9 +30,7 @@ def create_cmd
   when 'A'
     cmd << ' -A'
     cmd << " -IPv4Address #{new_resource.ipv4_address}"
-    if create_ptr == true
-      cmd << " -CreatePtr"
-    end
+    cmd << ' -CreatePtr' if new_resource.create_ptr
   when 'MX'
     cmd << ' -Mx'
     cmd << " -MailExchange #{new_resource.mail_exchange}"
@@ -65,13 +51,15 @@ def create_cmd
   cmd
 end
 
-def exists?
-  cmd = ''
-  cmd << '$record = Get-DnsServerResourceRecord'
-  cmd << " -ZoneName #{new_resource.zone_name}"
-  cmd << " -Name #{new_resource.name}"
-  cmd << " -RRType #{new_resource.record_type};"
-  cmd << '$record -ne $null'
-  check = Mixlib::ShellOut.new("powershell.exe -command \"& {#{cmd}}\"").run_command
-  check.stdout.match('True')
+action_class do
+  def exists?
+    cmd = ''
+    cmd << '$record = Get-DnsServerResourceRecord'
+    cmd << " -ZoneName #{new_resource.zone_name}"
+    cmd << " -Name #{new_resource.name}"
+    cmd << " -RRType #{new_resource.record_type};"
+    cmd << '$record -ne $null'
+    check = Mixlib::ShellOut.new("powershell.exe -command \"& {#{cmd}}\"").run_command
+    check.stdout.match('True')
+  end
 end

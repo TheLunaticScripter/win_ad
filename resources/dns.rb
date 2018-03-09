@@ -21,37 +21,37 @@ action :create do
   end
 end
 
-def create_cmd
-  cmd = ''
-  cmd << 'Add-DnsServerResourceRecord'
-  cmd << " -ZoneName #{new_resource.zone_name}"
-  cmd << " -Name #{new_resource.name}"
-  case record_type
-  when 'A'
-    cmd << ' -A'
-    cmd << " -IPv4Address #{new_resource.ipv4_address}"
-    cmd << ' -CreatePtr' if new_resource.create_ptr
-  when 'MX'
-    cmd << ' -Mx'
-    cmd << " -MailExchange #{new_resource.mail_exchange}"
-    cmd << " -Preference #{new_resource.preference}"
-  when 'CName'
-    cmd << ' -CName'
-    cmd << " -HostNameAlias #{new_resource.host_name_alias}"
-  when 'SRV'
-    cmd << ' -Srv'
-    cmd << " -DomainName #{new_resource.host_name}"
-    cmd << " -Port #{new_resource.port}"
-    cmd << " -Priority #{new_resource.priority}"
-    cmd << " -Weight #{new_resource.weight}"
-  else
-    cmd = ''
-    Chef::Log.error("The record_type of #{new_resource.record_type} is not vaild.")
-  end
-  cmd
-end
-
 action_class do
+  def create_cmd
+    cmd = ''
+    cmd << 'Add-DnsServerResourceRecord'
+    cmd << " -ZoneName #{new_resource.zone_name}"
+    cmd << " -Name #{new_resource.name}"
+    case new_resource.record_type
+    when 'A'
+      cmd << ' -A'
+      cmd << " -IPv4Address #{new_resource.ipv4_address}"
+      cmd << ' -CreatePtr' if new_resource.create_ptr
+    when 'MX'
+      cmd << ' -Mx'
+      cmd << " -MailExchange #{new_resource.mail_exchange}"
+      cmd << " -Preference #{new_resource.preference}"
+    when 'CName'
+      cmd << ' -CName'
+      cmd << " -HostNameAlias #{new_resource.host_name_alias}"
+    when 'SRV'
+      cmd << ' -Srv'
+      cmd << " -DomainName #{new_resource.host_name}"
+      cmd << " -Port #{new_resource.port}"
+      cmd << " -Priority #{new_resource.priority}"
+      cmd << " -Weight #{new_resource.weight}"
+    else
+      cmd = ''
+      Chef::Log.error("The record_type of #{new_resource.record_type} is not vaild.")
+    end
+    cmd
+  end
+
   def exists?
     cmd = ''
     cmd << '$record = Get-DnsServerResourceRecord'

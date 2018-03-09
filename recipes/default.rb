@@ -28,7 +28,7 @@ end
 
 win_ad_group_member 'Test Group Member' do
   group_name 'Test Group'
-  user_name 'Administrator'
+  user_name 'chef'
   type 'user'
 end
 

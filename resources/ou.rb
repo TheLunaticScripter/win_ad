@@ -6,7 +6,7 @@ action :create do
     new_resource.updated_by_last_action(false)
   else
     cmd = ''
-    cmd << "$Protect = #{new_resource.protect};"
+    cmd << "$Protect = #{new_resource.protect ? '$true' : '$false'};"
     cmd << 'New-ADOrganizationalUnit'
     cmd << " -Name:\"#{new_resource.name}\""
     cmd << " -Path:\"#{new_resource.path}\""
@@ -15,7 +15,6 @@ action :create do
     powershell_script "Create Ou #{new_resource.name}" do
       code cmd
     end
-    @new_resource.updated_by_last_action(true)
   end
 end
 

@@ -1,9 +1,3 @@
-#
-# Cookbook Name:: win_ad
-# Spec:: default
-#
-# Copyright (c) 2016 The Authors, All Rights Reserved.
-
 require 'spec_helper'
 
 describe 'win_ad::default' do

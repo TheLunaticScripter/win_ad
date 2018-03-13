@@ -2,9 +2,7 @@ property :path, String, required: true
 property :protect, [true, false], default: true
 
 action :create do
-  if exists?
-    new_resource.updated_by_last_action(false)
-  else
+  unless exists?
     cmd = ''
     cmd << "$Protect = #{new_resource.protect ? '$true' : '$false'};"
     cmd << 'New-ADOrganizationalUnit'

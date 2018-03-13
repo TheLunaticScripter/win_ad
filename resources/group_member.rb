@@ -3,9 +3,7 @@ property :user_name, String, required: true
 property :type, String, default: 'user'
 
 action :add do
-  if exists?
-    new_resource.updated_by_last_action(false)
-  else
+  unless exists?
     cmd = create_cmd
     cmd << 'Set-AdGroup'
     cmd << " -Identity \"#{new_resource.group_name}\""

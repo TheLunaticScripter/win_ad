@@ -3,9 +3,7 @@ property :scope, String, default: 'Global'
 property :path, String, required: true
 
 action :create do
-  if exists?
-    new_resource.updated_by_last_action(false)
-  else
+  unless exists?
     cmd = ''
     cmd << 'New-ADGroup'
     cmd << " -GroupCategory:\"#{new_resource.category}\""

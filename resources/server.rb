@@ -6,9 +6,7 @@ property :domain_user, String
 property :domain_pass, String
 
 action :install_ad_services do
-  if exists?
-    new_resource.updated_by_last_action(false)
-  else
+  unless exists?
     [
       'AD-Domain-Services',
       'DNS',

@@ -6,9 +6,7 @@ property :path, String
 property :restart, [true, false], default: true
 
 action :join_domain do
-  if on_domain?
-    new_resource.updated_by_last_action(false)
-  else
+  unless on_domain?
     cmd = ''
     cmd << '$pswd = ConvertTo-SecureString'
     cmd << " \'#{new_resource.domain_pswd}\'"
@@ -29,9 +27,7 @@ action :join_domain do
 end
 
 action :set_dns_server do
-  if dns_servers_set?
-    new_resource.updated_by_last_action(false)
-  else
+  unless dns_servers_set?
     cmd = ''
     cmd << "$CorrectDNS = #{new_resource.dns_server};"
     cmd << '$NIC = Get-NetAdapter | where {$_.Status -eq "Up"};'

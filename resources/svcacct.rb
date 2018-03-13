@@ -2,9 +2,7 @@ property :path, String, required: true
 property :pswd, String, required: true
 
 action :create do
-  if exists?
-    new_resource.updated_by_last_action(false)
-  else
+  unless exists?
     cmd = ''
     cmd << "$password = ConvertTo-SecureString \'#{new_resource.pswd}\' -AsPlainText -Force;"
     cmd << 'New-ADUser'

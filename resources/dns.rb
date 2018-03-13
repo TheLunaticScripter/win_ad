@@ -12,9 +12,7 @@ property :priority, Integer
 property :weight, Integer
 
 action :create do
-  if exists?
-    new_resource.updated_by_last_action(false)
-  else
+  unless exists?
     powershell_script "Create #{new_resource.record_type} record in DNS." do
       code create_cmd
     end

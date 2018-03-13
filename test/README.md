@@ -1,1 +1,0 @@
-Stuff to test this win_ad cookbook

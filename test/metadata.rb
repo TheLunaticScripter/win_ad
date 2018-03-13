@@ -1,7 +1,0 @@
-name 'win_ad_test'
-maintainer 'John Snow'
-maintainer_email 'jsnow@chef.io'
-license 'all_rights'
-description 'Test Installs/Configures win_ad'
-long_description 'Test Installs/Configures win_ad'
-version '2.0.8'

@@ -37,7 +37,7 @@ action :join_domain do
     cmd << 'Add-Computer'
     cmd << " -DomainName #{new_resource.domain_name}"
     cmd << ' -Credential $credential'
-    cmd << " -OUPath \"#{new_resource.path}\""
+    cmd << " -OUPath \"#{new_resource.path}\"" if new_resource.path
     cmd << ' -Restart' if new_resource.restart
     cmd << ' -Force'
     powershell_script "Add this node to the #{new_resource.domain_name} domain." do

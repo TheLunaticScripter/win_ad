@@ -1,40 +1,30 @@
-# win_ad
+# Windows Active Directory (AD) and Domain Name Service (DNS) Chef Cookbook
 
-Windows Active Directory (AD) and Domain Name Service (DNS) Cookbook
-=============================================
+A library cookbook with resources for creating and managing Windows AD and DNS
 
-Requirements
-------------
-#### Platforms
+## Requirements
+
+### Platforms
+
 * Windows Server 2012 (R1, R2)
 
-#### Chef
-- Chef 12+
+### Chef
 
-Usage
------
+* Chef 12+
 
-### Purpose
-This is a library cookbook with custom resources to create and manage Windows AD and DNS
-
-Recipes
--------
-
-### default.rb
-Demonstrates how to use the resources in this cookbook and used for test-kitchen.
-This will be deprecated at some point favor of the test cookbook method.
-
-Custom Resources
-----------------
+## Resources
 
 ### win_ad_client
+
 Add a Client to a domain, or Set the DNS Server search list on the server
 
 #### Actions
+
 - 'join_domain' - Join a client to a domain
 - 'set_dns_server' - Set the DNS Server search list
 
 #### Properties
+
 - 'domain_name' - Name of the domain the client will be joined tools
 - 'dns_server' - List of DNS Servers, NOTE: Format is "'10.0.0.1','10.0.0.2'" for more than one server
 - 'domain_user' - User name of a Domain user who can join the client to the domain
@@ -43,9 +33,10 @@ Add a Client to a domain, or Set the DNS Server search list on the server
 - 'restart' - Whether client restarts after being added. True or False value
 
 #### Examples
+
 Join a Computer to the foo.local domain
 
-```
+```ruby
 win_ad_client 'Join computer to foo.local' do
   action :join_domain
   domain_name 'foo.local'
@@ -58,7 +49,7 @@ end
 
 Set DNS search server
 
-```
+```ruby
 win_ad_client 'Set DNS Servers' do
   action :set_dns_server
   dns_server "'10.0.0.1','10.0.0.2'"
@@ -66,12 +57,15 @@ end
 ```
 
 ### win_ad_dns
+
 Creates an A record, MX record, SRV record, or CName record in Windows DNS
 
 #### Actions
+
 - 'create' - Create the record
 
 #### Properties
+
 - 'name'       - Host Name, or service name for the record being created
 - 'zone_name'  - DNS Zone the record will be created in
 - 'record_type' - Type of record being created (note: valid entries are 'A', 'MX', 'CName', and 'SRV')
@@ -87,9 +81,10 @@ Creates an A record, MX record, SRV record, or CName record in Windows DNS
 - 'weight' - The weight for the SRV record
 
 #### Examples
+
 Create an A record  
 
-```
+```ruby
 win_ad_dns 'server-name' do
   zone_name 'foo.local'
   ipv4_address '10.0.0.2'
@@ -99,7 +94,7 @@ end
 
 Create a CName record
 
-```
+```ruby
 win_ad_dns 'alias' do
   record_type 'CName'
   zone_name 'foo.local'
@@ -109,7 +104,7 @@ end
 
 Create a MX record
 
-```
+```ruby
 win_ad_dns 'foo.local' do
   record_type 'MX'
   zone_name 'foo.local'
@@ -120,7 +115,7 @@ end
 
 Create a SRV record
 
-```
+```ruby
 win_ad_dns 'service_name' do
   record_type 'SRV'
   zone_name 'foo.local'
@@ -132,21 +127,25 @@ end
 ```
 
 ### win_ad_group
+
 Manages AD Security Groups
 
 #### Actions
+
 - 'create' - Creates a new AD Groups
 
 #### Properties
+
 - 'name' - Name of the group being created it can contain spaces
 - 'category' - Type of Group being created. Valid options are Security and Distribution. Default is Security.
 - 'scope' - The scope the group will apply to. Valid options are Domain local, Global, and Universal. Default is Global.
 - 'path' - The location the group will be created in AD. Format is "OU=OU Name,DC=foo,DC=local"
 
 #### Examples
+
 Create a new Global Security Group called Test Group
 
-```
+```ruby
 win_ad_group 'Test Group' do
   path 'OU=Groups,DC=foo,DC=local'
 end
@@ -154,7 +153,7 @@ end
 
 Create a new Universal Distribution Group called UD Group
 
-```
+```ruby
 win_ad_group 'UD Group' do
   category 'Distribution'
   scope 'Universal'
@@ -163,12 +162,15 @@ end
 ```
 
 ### win_ad_group_member
+
 Adds Users to a Security or Distribution Group in AD
 
 #### Actions
+
 - 'add' - Add a User to a Group
 
 #### Properties
+
 - 'group_name' - Name of the group the User is being added to
 - 'user_name' - Name of the User being added to the group.
 - 'type' - Type of object to be added as a member. Valid options are user, group, or computer.
@@ -176,7 +178,7 @@ Adds Users to a Security or Distribution Group in AD
 #### Examples
 Add a user joe.bob to the Test Group
 
-```
+```ruby
 win_ad_group_member 'Add joe.bob to Test Group' do
   group_name 'Test Group'
   user_name 'joe.bob'
@@ -185,32 +187,39 @@ end
 ```
 
 ### win_ad_ou
+
 Creates Organizational Units (OU) in AD
 
 #### Actions
+
 - 'create' - Creates an OU
 
 #### Properties
+
 - 'name' - Name of the OU to be created
 - 'path' - OU or Folder where the OU will be created
 - 'protect' - Boolean wether to protect the OU from accidental deletion
 
 #### Examples
+
 Create the Testing OU at the root of the Domain
 
-```
+```ruby
 win_ad_ou 'Testing' do
   path 'DC=foo,DC=local'
 end
 ```
 
 ### win_ad_server
+
 Installs core AD and DNS Features. Creates a Forest, child domain, or adds a replica server to an existing domain.
 
 #### Actions
+
 - 'install_ad_services' - Installs AD and DNS and performs the necessary post feature install domain commands.
 
 #### Properties
+
 - 'domain_name' - Name of the domain being created or joined
 - 'restart' - Boolean wether the install should be allowed to restart after complete
 - 'safe_mode_pass' - Safe Mode Password for the Domain
@@ -221,7 +230,7 @@ Installs core AD and DNS Features. Creates a Forest, child domain, or adds a rep
 #### Examples
 Create the foo.local forest
 
-```
+```ruby
 win_ad_server 'foo.local' do
   domain_name 'foo.local'
   safe_mode_pass 'super_secret_password123'
@@ -231,7 +240,7 @@ end
 
 Create a replica Domain Controller
 
-```
+```ruby
 win_ad_server 'foo.local' do
   domain_name 'foo.local
   safe_mode_pass 'super_secret_password123'
@@ -275,13 +284,21 @@ Use in a recipe
 win_ad_tools 'Install RSAT'
 ```
 
-License & Authors
------------------
+## Recipes
+
+### default.rb
+
+Demonstrates how to use the resources in this cookbook and used for test-kitchen.
+This will be deprecated at some point favor of the test cookbook method.
+
+
+## License & Authors
+
 - Author:: John Snow (thelunaticscripter@outlook.com)
 - Author:: Nestor Rentas (nestor.rentas.ctr@socom.mil)
 
 ```text
-Copyright 2016, TheLunaticScripter.com
+Copyright 2016-2018, TheLunaticScripter.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -20,8 +20,8 @@
 
 property :domain_name, String, required: true
 property :dns_server, String
-property :domain_user, String
-property :domain_pswd, String
+property :domain_user, String, required: true
+property :domain_pswd, String, required: true
 property :path, String
 property :restart, [true, false], default: true
 

@@ -16,6 +16,8 @@ A library cookbook with resources for creating and managing Windows AD and DNS
 
 ### win_ad_client
 
+#### This resource will be Deprecated with the release of Chef Client 14.x which contains the windows_ad_join resource.
+
 Add a Client to a domain, or Set the DNS Server search list on the server
 
 #### Actions

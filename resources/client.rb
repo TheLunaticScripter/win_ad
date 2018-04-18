@@ -18,7 +18,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-deprecated 'This resource will be deprecated with the release of Chef Client 14.x which contains the windows_ad_join resource.'
+# deprecated 'This resource will be deprecated with the release of Chef Client 14.x which contains the windows_ad_join resource.'
 
 property :domain_name, String, required: true
 property :dns_server, String

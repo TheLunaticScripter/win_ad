@@ -40,10 +40,15 @@ action :join_domain do
     cmd << " -DomainName #{new_resource.domain_name}"
     cmd << ' -Credential $credential'
     cmd << " -OUPath \"#{new_resource.path}\"" if new_resource.path
-    cmd << ' -Restart' if new_resource.restart
     cmd << ' -Force'
     powershell_script "Add this node to the #{new_resource.domain_name} domain." do
       code cmd
+      notifies :reboot_now, 'reboot[reboot_for_join]' if new_resource.restart
+    end
+    reboot 'reboot_for_join' do
+      action :nothing
+      reason 'Rebooting the node to complete domain join.'
+      delay_mins 1
     end
   end
 end
